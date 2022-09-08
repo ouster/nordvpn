@@ -14,19 +14,24 @@ if ! iptables -L > /dev/null 2>&1; then
   done
 fi
 
+nordvpn set killswitch disable
+
 [[ -z "${PASS}" ]] && [[ -f "${PASSFILE}" ]] && PASS="$(head -n 1 "${PASSFILE}")"
 nordvpn logout > /dev/null
 
 if [[ -n ${TOKEN} ]]; then
   nordvpn login --token "${TOKEN}" || {
     echo "Invalid token."
+    nordvpn set killswitch enable
     exit 1
   }
 else
   nordvpn login --legacy --username "${USER}" --password "${PASS}" || {
     echo "Invalid Username or password."
+    nordvpn set killswitch enable
     exit 1
   }
 fi
 
+nordvpn set killswitch enable
 exit 0

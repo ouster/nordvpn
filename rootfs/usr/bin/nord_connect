@@ -3,16 +3,19 @@
 [[ -n ${PRE_CONNECT} ]] && eval ${PRE_CONNECT}
 
 echo "Connecting..."
+nordvpn set killswitch disable
 current_sleep=1
 until nordvpn connect ${CONNECT}; do
   if [ ${current_sleep} -gt 4096 ]; then
     echo "Unable to connect."
+    nordvpn set killswitch enable
     exit 1
   fi
   echo "Unable to connect retrying in ${current_sleep} seconds."
   sleep ${current_sleep}
   current_sleep=$((current_sleep * 2))
 done
+nordvpn set killswitch enable
 
 [[ -n ${POST_CONNECT} ]] && eval ${POST_CONNECT}
 
